@@ -31,7 +31,7 @@ Param(
 	Begin Script
   ********************************************************************************#>	
 #$cluster = Get-Cluster $ClusterName
-$clusterName | ForEach-Object {
+$clusterName | Foreach-Object {
 $cluster = Get-Cluster $_
 <#Disable HA if it is enabled.
 $enableHA = ""
@@ -87,6 +87,11 @@ if ($enableHA){
 		Set-Cluster $cluster -HAEnabled:$true -Confirm:$false
 	}#>
 }
+
+$ClusterName | Foreach-Object {
+	Write-Host "Review host compliance on cluster $_ below:" -ForegroundColor  Magenta
+	Test-Compliance -Entity $cluster
+	}
 	
 <#********************************************************************************
 	End Script
