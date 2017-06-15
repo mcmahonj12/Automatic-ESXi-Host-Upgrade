@@ -1,6 +1,7 @@
 # Automatic-ESXi-Host-Upgrade
 Host upgrade uses performs configuration backups of hosts and uses VUM to upgrade hosts which are backed up and "NonCompliant" serially. Clusters can be upgraded one at a time and the script accepts pipeline in the ClusterName paramater to upgrade multiple clusters if desired.
 
+Summary
 The script first gets the cluster objects which were specified. Mutiple clusters can be specified if desired. It then gets all hosts in
 the cluster to be upgraded and attempts to disconnect any ISOs which may be connected to VMs. These ISOs may prevent the host from 
 entering maintenance mode.
@@ -23,6 +24,12 @@ Finally, the baseline is applied to each host serially and the upgrade begins. T
 5. Host reboots.
 6. Once the host re-connects to the vCenter Server, the host is removed from maintenance mode and the process begins again.
 
+Prereqs:
+  - PowerCLI 5.5 or higher (tested with 6.5)
+  - VUM version matching the major build to be deployed (no 5.5 VUM to deploy ESXi 6.5)
+  - Downloaded ISO of the ESXi image to deploy
+
+Procedure
 Steps to prepare and run the script:
 1. Download an ESXi ISO image from the VMware respository.
 2. Add any required 3rd party VIBs as desired to the image. Use ImageBuilder to perform this task and export the new image as an ISO.
@@ -34,3 +41,7 @@ Steps to prepare and run the script:
   - Baseline: The name of the upgrade baseline just created. Use Get-Baseline to see a list of baselines if unsure.
   - ConfigBackupDestination: This is the destination for host configuration backups. This can be a UNC path.
   
+Known Issues:
+Update-Entity: If the hosts take a long time to reboot, PowerShell may give an error "The request channel timed out while waiting for a reply..." This is normal and means the shell timeout is set to the default. This does not impact the running commands and can be ignored.
+
+Remove ISO: An error may occur indicating the action cannot be performed on a VM in the state "PoweredOff." This is fine as the VM will not impact maintenance mode. For speed I just allow this error to occur rather than checking to see if each VM is powered on/off.
